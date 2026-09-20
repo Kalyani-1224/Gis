@@ -1,0 +1,995 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>GeoVision | GIS Explorer</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Leaflet CSS -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+
+    <!-- Leaflet Draw CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css"
+    />
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/dashboard.css" />
+  </head>
+
+  <body>
+    <div class="app-shell">
+      <!-- =====================================================
+           SIDEBAR
+      ====================================================== -->
+
+      <aside id="sidebar" class="sidebar glass-panel">
+        <!-- BRAND -->
+        <div class="brand">
+          <div class="brand-icon">
+            <span>✦</span>
+          </div>
+
+          <div>
+            <h1>Geo<span>Vision</span></h1>
+            <p>GIS EXPLORER</p>
+          </div>
+        </div>
+
+        <!-- WORKSPACE -->
+        <div class="workspace">
+          <span class="status-dot"></span>
+          <span>Workspace</span>
+          <span class="ml-auto text-xs text-cyan-300">LIVE</span>
+        </div>
+
+        <!-- NAVIGATION -->
+        <nav class="nav-section">
+          <p class="nav-label">MAIN MENU</p>
+
+          <button class="nav-item active">
+            <span>▦</span>
+            <span>Map Overview</span>
+          </button>
+
+          <button class="nav-item" onclick="focusMap()">
+            <span>⌖</span>
+            <span>Explore Map</span>
+          </button>
+
+          <button class="nav-item" onclick="openPanel('layersPanel')">
+            <span>▤</span>
+            <span>Layer Management</span>
+          </button>
+
+          <button class="nav-item" onclick="openPanel('toolsPanel')">
+            <span>⌘</span>
+            <span>GIS Tools</span>
+          </button>
+
+          <p class="nav-label mt-8">WORKSPACE</p>
+
+          <!-- MY PROJECTS -->
+          <button
+            class="nav-item"
+            onclick="showToast('Projects module coming soon')"
+          >
+            <span>▣</span>
+            <span>My Projects</span>
+          </button>
+
+          <!-- ANALYTICS -->
+          <button class="nav-item" onclick="openPanel('analyticsPanel')">
+            <span>◌</span>
+            <span>Analytics</span>
+          </button>
+
+          <!-- SETTINGS -->
+          <button
+            class="nav-item"
+            onclick="showToast('Settings module coming soon')"
+          >
+            <span>⚙</span>
+            <span>Settings</span>
+          </button>
+        </nav>
+
+        <!-- SIDEBAR BOTTOM -->
+        <div class="sidebar-bottom">
+          <div class="upgrade-card">
+            <div class="text-cyan-300 text-2xl mb-2">✦</div>
+
+            <h3>Build your world</h3>
+
+            <p>Explore, analyze and visualize spatial data.</p>
+
+            <button onclick="showToast('Welcome to GeoGlass!')">
+              Explore Workspace →
+            </button>
+          </div>
+
+          <!-- USER PROFILE -->
+          <div class="user-card">
+            <div class="avatar">KG</div>
+
+            <div>
+              <h4>Kalyani</h4>
+              <p>GIS Explorer</p>
+            </div>
+
+            <!-- PROFILE SETTINGS BUTTON -->
+            <button onclick="openProfilePanel()" title="Profile Settings">
+              ⋮
+            </button>
+          </div>
+        </div>
+      </aside>
+
+      <!-- =====================================================
+           MAIN CONTENT
+      ====================================================== -->
+
+      <main class="main-content">
+        <!-- TOP BAR -->
+        <header class="topbar">
+          <div class="flex items-center gap-3">
+            <button
+              id="sidebarToggle"
+              class="icon-btn mobile-only"
+              aria-label="Toggle sidebar"
+            >
+              ☰
+            </button>
+
+            <div>
+              <p class="eyebrow">GEOSPATIAL WORKSPACE</p>
+
+              <h2 class="page-title">Map Overview</h2>
+            </div>
+          </div>
+
+          <div class="topbar-actions">
+            <div class="connection">
+              <span class="status-dot"></span>
+              <span>Connected</span>
+            </div>
+
+            <button
+              class="icon-btn"
+              onclick="toggleTheme()"
+              title="Toggle theme"
+            >
+              ◐
+            </button>
+
+            <button
+              class="icon-btn"
+              onclick="showToast('Notifications are clear')"
+              title="Notifications"
+            >
+              ♧
+            </button>
+          </div>
+        </header>
+
+        <!-- =====================================================
+             STATISTICS
+        ====================================================== -->
+
+        <section class="stats-grid">
+          <div class="stat-card glass-panel">
+            <div class="stat-icon cyan">⌖</div>
+
+            <div>
+              <p>Total Features</p>
+
+              <h3 id="featureCount">24</h3>
+
+              <span class="positive"> ↗ Sample dataset </span>
+            </div>
+          </div>
+
+          <div class="stat-card glass-panel">
+            <div class="stat-icon purple">▤</div>
+
+            <div>
+              <p>Active Layers</p>
+
+              <h3 id="activeLayerCount">4</h3>
+
+              <span class="positive"> ● Online </span>
+            </div>
+          </div>
+
+          <div class="stat-card glass-panel">
+            <div class="stat-icon blue">⌗</div>
+
+            <div>
+              <p>Map Zoom</p>
+
+              <h3 id="zoomValue">12</h3>
+
+              <span class="muted-text"> Interactive scale </span>
+            </div>
+          </div>
+
+          <div class="stat-card glass-panel">
+            <div class="stat-icon orange">◎</div>
+
+            <div>
+              <p>Map Status</p>
+
+              <h3 class="small-stat">Ready</h3>
+
+              <span class="positive"> ● Operational </span>
+            </div>
+          </div>
+        </section>
+
+        <!-- =====================================================
+             MAP AREA
+        ====================================================== -->
+
+        <section class="map-layout">
+          <!-- MAP -->
+          <div class="map-wrapper glass-panel">
+            <!-- MAP TOOLBAR -->
+            <div class="map-toolbar">
+              <div class="map-title">
+                <span class="live-pulse"></span>
+
+                <div>
+                  <h3>Hyderabad GIS Map</h3>
+
+                  <p>Interactive spatial explorer</p>
+                </div>
+              </div>
+
+              <div class="map-actions">
+                <button
+                  class="map-action"
+                  onclick="locateUser()"
+                  title="Find my location"
+                >
+                  ⌖
+                  <span class="desktop-label"> Locate </span>
+                </button>
+
+                <button
+                  class="map-action"
+                  onclick="resetMap()"
+                  title="Reset map"
+                >
+                  ↻
+                  <span class="desktop-label"> Reset </span>
+                </button>
+
+                <button
+                  class="map-action"
+                  onclick="toggleFullscreen()"
+                  title="Fullscreen"
+                >
+                  ⛶
+                </button>
+              </div>
+            </div>
+
+            <!-- SEARCH -->
+            <div class="map-search">
+              <span>⌕</span>
+
+              <input
+                id="searchInput"
+                type="text"
+                placeholder="Search location, city or feature..."
+              />
+
+              <button onclick="searchLocation()">Search</button>
+            </div>
+
+            <!-- LEAFLET MAP -->
+            <div id="map"></div>
+
+            <!-- FLOATING MAP CONTROLS -->
+            <div class="map-controls">
+              <button onclick="zoomIn()" title="Zoom in">+</button>
+
+              <button onclick="zoomOut()" title="Zoom out">−</button>
+
+              <div class="control-divider"></div>
+
+              <button onclick="resetMap()" title="Reset map">⌂</button>
+            </div>
+
+            <!-- MAP COORDINATES -->
+            <div class="coordinates glass-panel">
+              <span class="coordinate-dot"></span>
+
+              <span id="coordinates"> Lat: 17.3850 | Lng: 78.4867 </span>
+            </div>
+
+            <!-- MAP LEGEND -->
+            <div class="map-legend glass-panel">
+              <div class="legend-heading">
+                <span> Map Legend </span>
+
+                <button onclick="toggleLegend()">−</button>
+              </div>
+
+              <div id="legendContent">
+                <div class="legend-row">
+                  <span class="legend-dot city"></span>
+
+                  <span> GIS Features </span>
+                </div>
+
+                <div class="legend-row">
+                  <span class="legend-dot park"></span>
+
+                  <span> Green Areas </span>
+                </div>
+
+                <div class="legend-row">
+                  <span class="legend-line"></span>
+
+                  <span> Road Network </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- MAP FOOTER -->
+            <div class="map-footer">
+              <span> © OpenStreetMap contributors </span>
+
+              <span> Leaflet.js </span>
+            </div>
+          </div>
+
+          <!-- =====================================================
+               RIGHT SIDEBAR
+          ====================================================== -->
+
+          <aside class="right-sidebar">
+            <!-- =================================================
+                 LAYERS PANEL
+            ================================================== -->
+
+            <div id="layersPanel" class="side-panel glass-panel">
+              <div class="panel-header">
+                <div>
+                  <p class="eyebrow">GIS DATA</p>
+
+                  <h3>Layers</h3>
+                </div>
+
+                <button class="icon-btn" onclick="togglePanel('layersPanel')">
+                  −
+                </button>
+              </div>
+
+              <!-- LAYER SEARCH -->
+              <div class="layer-search">
+                <span>⌕</span>
+
+                <input
+                  id="layerSearch"
+                  type="text"
+                  placeholder="Filter layers..."
+                  oninput="filterLayers()"
+                />
+              </div>
+
+              <!-- BASE MAP -->
+              <div class="layer-group-title">
+                <span> BASE MAP </span>
+
+                <span> 1 LAYER </span>
+              </div>
+
+              <div class="layer-item" data-layer-name="Dark Base Map">
+                <div class="layer-info">
+                  <span class="layer-symbol base-symbol"> ◈ </span>
+
+                  <div>
+                    <h4>Dark Base Map</h4>
+
+                    <p>OpenStreetMap</p>
+                  </div>
+                </div>
+
+                <label class="switch">
+                  <input
+                    type="checkbox"
+                    id="baseToggle"
+                    checked
+                    onchange="toggleBaseMap(this.checked)"
+                  />
+
+                  <span></span>
+                </label>
+              </div>
+
+              <!-- GIS DATA LAYERS -->
+              <div class="layer-group-title mt-5">
+                <span> GIS DATA LAYERS </span>
+
+                <span> 4 LAYERS </span>
+              </div>
+
+              <!-- CITY -->
+              <div class="layer-item" data-layer-name="City Features">
+                <div class="layer-info">
+                  <span class="layer-symbol city-symbol"> ● </span>
+
+                  <div>
+                    <h4>City Features</h4>
+
+                    <p>Point locations</p>
+                  </div>
+                </div>
+
+                <label class="switch">
+                  <input
+                    type="checkbox"
+                    checked
+                    onchange="toggleLayer('city', this.checked)"
+                  />
+
+                  <span></span>
+                </label>
+              </div>
+
+              <!-- GREEN AREAS -->
+              <div class="layer-item" data-layer-name="Green Areas">
+                <div class="layer-info">
+                  <span class="layer-symbol park-symbol"> ▰ </span>
+
+                  <div>
+                    <h4>Green Areas</h4>
+
+                    <p>Park polygons</p>
+                  </div>
+                </div>
+
+                <label class="switch">
+                  <input
+                    type="checkbox"
+                    checked
+                    onchange="toggleLayer('parks', this.checked)"
+                  />
+
+                  <span></span>
+                </label>
+              </div>
+
+              <!-- ROAD NETWORK -->
+              <div class="layer-item" data-layer-name="Road Network">
+                <div class="layer-info">
+                  <span class="layer-symbol road-symbol"> ━ </span>
+
+                  <div>
+                    <h4>Road Network</h4>
+
+                    <p>Road lines</p>
+                  </div>
+                </div>
+
+                <label class="switch">
+                  <input
+                    type="checkbox"
+                    checked
+                    onchange="toggleLayer('roads', this.checked)"
+                  />
+
+                  <span></span>
+                </label>
+              </div>
+
+              <!-- STUDY BOUNDARY -->
+              <div class="layer-item" data-layer-name="Study Boundary">
+                <div class="layer-info">
+                  <span class="layer-symbol boundary-symbol"> ▱ </span>
+
+                  <div>
+                    <h4>Study Boundary</h4>
+
+                    <p>Polygon boundary</p>
+                  </div>
+                </div>
+
+                <label class="switch">
+                  <input
+                    type="checkbox"
+                    checked
+                    onchange="toggleLayer('boundary', this.checked)"
+                  />
+
+                  <span></span>
+                </label>
+              </div>
+
+              <!-- OPACITY -->
+              <div class="opacity-control">
+                <div class="flex justify-between items-center">
+                  <label> Layer Opacity </label>
+
+                  <span id="opacityValue"> 100% </span>
+                </div>
+
+                <input
+                  id="opacitySlider"
+                  type="range"
+                  min="0"
+                  max="100"
+                  value="100"
+                  oninput="changeOpacity(this.value)"
+                />
+              </div>
+            </div>
+
+            <!-- =================================================
+                 GIS TOOLS PANEL
+            ================================================== -->
+
+            <div id="toolsPanel" class="side-panel glass-panel">
+              <div class="panel-header">
+                <div>
+                  <p class="eyebrow">SPATIAL ANALYSIS</p>
+
+                  <h3>GIS Tools</h3>
+                </div>
+
+                <button class="icon-btn" onclick="togglePanel('toolsPanel')">
+                  −
+                </button>
+              </div>
+
+              <div class="tools-grid">
+                <button class="tool-card" onclick="startMeasure()">
+                  <span>⌁</span>
+
+                  <strong> Measure </strong>
+
+                  <small> Distance </small>
+                </button>
+
+                <button class="tool-card" onclick="startDraw()">
+                  <span>◇</span>
+
+                  <strong> Draw </strong>
+
+                  <small> Polygon / line </small>
+                </button>
+
+                <button class="tool-card" onclick="getCenterCoordinates()">
+                  <span>⌖</span>
+
+                  <strong> Coordinates </strong>
+
+                  <small> Map center </small>
+                </button>
+
+                <button class="tool-card" onclick="clearDrawings()">
+                  <span>⌫</span>
+
+                  <strong> Clear </strong>
+
+                  <small> Drawings </small>
+                </button>
+              </div>
+
+              <div class="tool-result" id="toolResult">
+                <p>Tool output</p>
+
+                <span> Select a GIS tool to begin. </span>
+              </div>
+            </div>
+
+            <!-- =================================================
+                 ANALYTICS PANEL
+            ================================================== -->
+
+            <div id="analyticsPanel" class="side-panel glass-panel">
+              <div class="panel-header">
+                <div>
+                  <p class="eyebrow">GIS ANALYTICS</p>
+
+                  <h3>Analytics</h3>
+                </div>
+
+                <button
+                  class="icon-btn"
+                  onclick="togglePanel('analyticsPanel')"
+                >
+                  −
+                </button>
+              </div>
+
+              <!-- ANALYTICS CARDS -->
+              <div class="analytics-grid">
+                <div class="analytics-card">
+                  <div class="analytics-icon cyan">⌖</div>
+
+                  <div>
+                    <span> Total Features </span>
+
+                    <strong> 24 </strong>
+                  </div>
+                </div>
+
+                <div class="analytics-card">
+                  <div class="analytics-icon purple">▤</div>
+
+                  <div>
+                    <span> Active Layers </span>
+
+                    <strong id="analyticsLayerCount"> 4 </strong>
+                  </div>
+                </div>
+
+                <div class="analytics-card">
+                  <div class="analytics-icon blue">●</div>
+
+                  <div>
+                    <span> Locations </span>
+
+                    <strong> 6 </strong>
+                  </div>
+                </div>
+
+                <div class="analytics-card">
+                  <div class="analytics-icon green">▰</div>
+
+                  <div>
+                    <span> Green Areas </span>
+
+                    <strong> 2 </strong>
+                  </div>
+                </div>
+              </div>
+
+              <!-- FEATURE DISTRIBUTION -->
+              <div class="analytics-section">
+                <div class="analytics-section-header">
+                  <div>
+                    <p class="eyebrow">FEATURE DISTRIBUTION</p>
+
+                    <h4>Spatial Features</h4>
+                  </div>
+                </div>
+
+                <div class="analytics-row">
+                  <div class="analytics-label">
+                    <span class="analytics-dot city-dot"></span>
+
+                    <span> City Features </span>
+                  </div>
+
+                  <strong> 6 </strong>
+                </div>
+
+                <div class="analytics-bar">
+                  <span style="width: 60%"></span>
+                </div>
+
+                <div class="analytics-row">
+                  <div class="analytics-label">
+                    <span class="analytics-dot park-dot"></span>
+
+                    <span> Green Areas </span>
+                  </div>
+
+                  <strong> 2 </strong>
+                </div>
+
+                <div class="analytics-bar">
+                  <span style="width: 30%"></span>
+                </div>
+
+                <div class="analytics-row">
+                  <div class="analytics-label">
+                    <span class="analytics-dot road-dot"></span>
+
+                    <span> Road Network </span>
+                  </div>
+
+                  <strong> 3 </strong>
+                </div>
+
+                <div class="analytics-bar">
+                  <span style="width: 45%"></span>
+                </div>
+
+                <div class="analytics-row">
+                  <div class="analytics-label">
+                    <span class="analytics-dot boundary-dot"></span>
+
+                    <span> Study Boundary </span>
+                  </div>
+
+                  <strong> 1 </strong>
+                </div>
+
+                <div class="analytics-bar">
+                  <span style="width: 20%"></span>
+                </div>
+              </div>
+
+              <!-- SPATIAL DATA -->
+              <div class="analytics-section">
+                <div class="analytics-section-header">
+                  <div>
+                    <p class="eyebrow">SPATIAL DATA</p>
+
+                    <h4>Data Summary</h4>
+                  </div>
+                </div>
+
+                <div class="analytics-summary">
+                  <div>
+                    <span> Point Features </span>
+
+                    <strong> 6 </strong>
+                  </div>
+
+                  <div>
+                    <span> Line Features </span>
+
+                    <strong> 3 </strong>
+                  </div>
+
+                  <div>
+                    <span> Polygon Features </span>
+
+                    <strong> 3 </strong>
+                  </div>
+
+                  <div>
+                    <span> Map Zoom </span>
+
+                    <strong id="analyticsZoom"> 12 </strong>
+                  </div>
+                </div>
+              </div>
+
+              <!-- ANALYTICS STATUS -->
+              <div class="analytics-status">
+                <span class="status-dot"></span>
+
+                <div>
+                  <strong> Analysis Ready </strong>
+
+                  <small> Spatial data is available for analysis. </small>
+                </div>
+              </div>
+            </div>
+
+            <!-- =================================================
+                 PROFILE SETTINGS PANEL
+            ================================================== -->
+
+            <div
+              id="profilePanel"
+              class="side-panel glass-panel profile-panel"
+              style="display: none"
+            >
+              <!-- PROFILE HEADER -->
+              <div class="panel-header">
+                <div>
+                  <p class="eyebrow">ACCOUNT</p>
+
+                  <h3>Profile Settings</h3>
+                </div>
+
+                <button class="icon-btn" onclick="togglePanel('profilePanel')">
+                  −
+                </button>
+              </div>
+
+              <!-- PROFILE HEADER CARD -->
+              <div class="profile-header-card">
+                
+
+                <div>
+                  <h4 id="profileHeaderName">Kalyani</h4>
+
+                  <p id="profileHeaderRole">GIS Explorer</p>
+
+                  <span class="profile-status">
+                    <span class="status-dot"></span>
+                    Active
+                  </span>
+                </div>
+              </div>
+
+              <!-- PROFILE INFORMATION -->
+              <div class="profile-section">
+                <p class="eyebrow">PROFILE INFORMATION</p>
+
+                <div class="profile-field">
+                  <label> Full Name </label>
+
+                  <div class="profile-input">
+                    <span>◉</span>
+
+                    <input type="text" value="Kalyani" id="profileName" />
+                  </div>
+                </div>
+
+                <div class="profile-field">
+                  <label> Role </label>
+
+                  <div class="profile-input">
+                    <span>◇</span>
+
+                    <input type="text" value="GIS Explorer" id="profileRole" />
+                  </div>
+                </div>
+
+                <div class="profile-field">
+                  <label> Workspace </label>
+
+                  <div class="profile-input readonly">
+                    <span>▣</span>
+
+                    <input
+                      type="text"
+                      value="GeoVision GIS Explorer"
+                      readonly
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <!-- ACCOUNT STATUS -->
+              <div class="profile-section">
+                <p class="eyebrow">ACCOUNT STATUS</p>
+
+                <div class="profile-option">
+                  <div class="profile-option-icon">✓</div>
+
+                  <div>
+                    <strong> Workspace Access </strong>
+
+                    <small> Active </small>
+                  </div>
+
+                  <span class="profile-active"> ACTIVE </span>
+                </div>
+
+                <div class="profile-option">
+                  <div class="profile-option-icon">◈</div>
+
+                  <div>
+                    <strong> GIS Services </strong>
+
+                    <small> Connected </small>
+                  </div>
+
+                  <span class="profile-active"> ONLINE </span>
+                </div>
+              </div>
+
+              <!-- PROFILE ACTIONS -->
+              <div class="profile-actions">
+                <button
+                  class="profile-save-btn"
+                  onclick="saveProfileSettings()"
+                >
+                  Save Changes
+                </button>
+
+                <button
+                  class="profile-cancel-btn"
+                  onclick="closeProfilePanel()"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+
+            <!-- =================================================
+                 SEARCH RESULTS
+            ================================================== -->
+
+            <div class="side-panel glass-panel">
+              <div class="panel-header">
+                <div>
+                  <p class="eyebrow">FEATURE EXPLORER</p>
+
+                  <h3>Locations</h3>
+                </div>
+
+                <span class="badge"> SAMPLE DATA </span>
+              </div>
+
+              <div id="locationList" class="location-list"></div>
+            </div>
+          </aside>
+        </section>
+      </main>
+    </div>
+
+    <!-- =====================================================
+         TOAST
+    ====================================================== -->
+
+    <div id="toast" class="toast">
+      <span> ✦ </span>
+
+      <span id="toastMessage"> Action completed </span>
+    </div>
+
+    <!-- =====================================================
+         LEAFLET JS
+    ====================================================== -->
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <!-- =====================================================
+         LEAFLET DRAW JS
+    ====================================================== -->
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+
+    <!-- =====================================================
+         PROFILE SETTINGS SUPPORT
+    ====================================================== -->
+
+    <script>
+      function openProfilePanel() {
+        const panel = document.getElementById("profilePanel");
+
+        if (panel) {
+          panel.style.display = "";
+        }
+      }
+
+      function closeProfilePanel() {
+        const panel = document.getElementById("profilePanel");
+
+        if (panel) {
+          panel.style.display = "none";
+        }
+      }
+
+      function saveProfileSettings() {
+        const name = document.getElementById("profileName").value.trim();
+
+        const role = document.getElementById("profileRole").value.trim();
+
+        if (!name) {
+          showToast("Please enter your name");
+
+          return;
+        }
+
+        document.querySelector(".user-card h4").textContent = name;
+
+        document.querySelector(".user-card p").textContent =
+          role || "GIS Explorer";
+
+        document.getElementById("profileHeaderName").textContent = name;
+
+        document.getElementById("profileHeaderRole").textContent =
+          role || "GIS Explorer";
+
+        showToast("Profile settings saved");
+      }
+    </script>
+
+    <!-- =====================================================
+         CUSTOM JS
+    ====================================================== -->
+
+    <script src="js/dashboard.js"></script>
+  </body>
+</html>
